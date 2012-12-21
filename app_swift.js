@@ -18,8 +18,8 @@ var app = module.exports = express.createServer();
 
     var Swift = require('swift');
     var swift = new Swift({
-        user: 'choihankyu@kt.com'
-      , pass: 'MTMwOTg0NTI2OTEzMDk4NDQ0MzE2MjM0'
+        user: ''
+      , pass: ''
       , host: 'ssproxy.ucloudbiz.olleh.com'
       , port: 443
     }, function(err, res) {
