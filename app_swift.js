@@ -13,13 +13,25 @@ var isRange ;
 var isBam;
 var range;
 var isKill = 'False';
+var passport = require('passport')
+var BasicStrategy = require('passport-http').BasicStrategy
+
+passport.use(new BasicStrategy(
+  function(username, password, done) {
+    if (username.valueOf() === 'guest' &&
+      password.valueOf() === 'password')
+      return done(null, true);
+    else
+      return done(null, false);
+  }
+));
 
 var app = module.exports = express.createServer();
 
     var Swift = require('swift');
     var swift = new Swift({
-        user: ''
-      , pass: ''
+        user: 'choihankyu@kt.com'
+      , pass: 'MTMwOTg0NTI2OTEzMDk4NDQ0MzE2MjM0'
       , host: 'ssproxy.ucloudbiz.olleh.com'
       , port: 443
     }, function(err, res) {
@@ -31,16 +43,21 @@ var app = module.exports = express.createServer();
 // Configuration
 
 app.configure(function(){
+  app.use(express.cookieParser());
+  app.use(express.session({secret:'123abc',key:'express.sid'}));
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
   app.use(express.bodyParser());
   app.use(express.methodOverride());
-  app.use(app.router);
   app.use(express.static(__dirname + '/public'));
+  app.use(passport.initialize());
+  app.use(passport.session());
+  app.use(app.router);
 });
 
 app.configure('development', function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+  app.use(express.logger());
 });
 
 app.configure('production', function(){
@@ -138,11 +155,16 @@ function extend(destination, source) {
   return destination;
 }
 
-app.get('/store/:container/:object', function(req, res){
+//app.get('/yours/:container/:object', function(req, res){
+//app.get('/genomecloud/yourid/:object', function(req, res){
+app.get('/genomecloud/yourid/:object', passport.authenticate('basic', { session: false }), function(req, res){
 
 
-    var container = req.params.container
-  , object = req.params.object;
+    //var container = req.params.container
+    //, object = req.params.object;
+    var container = 'M_RESULT';
+    var object = req.params.object;
+   
 
     console.log(req.headers);
     console.log(req.url);
@@ -242,5 +264,5 @@ app.get('/hello/:username',function(req,res) {
   });
 });
 
-app.listen(80);
+app.listen(3000);
 //console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
